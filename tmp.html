@@ -1,0 +1,9 @@
+<script>
+    const data = {key : 'value'};
+    const json = JSON.stringify(data);
+    localStorage.setItem("test", json);
+
+    const newJson = localStorage.getItem("test");
+    const newData = JSON.parse(newJson);
+    console.log(newData['key']);
+</script>

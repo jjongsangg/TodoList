@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
+    <script
+      type="text/javascript"
+      src="//cdnjs.cloudflare.com/ajax/libs/jqueryui/1.10.4/jquery-ui.min.js"
+    ></script>
+    <script src="//netdna.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+    <link
+      href="//netdna.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css"
+      rel="stylesheet"
+      id="bootstrap-css"
+    />
+    <link rel="stylesheet" href="/todoList.css" />
+    <title>Title</title>
+  </head>
+  <body>
+    <div class="container">
+      <div class="row">
+        <div class="col-md-6">
+          <div class="todolist not-done">
+            <h1>TODO LIST</h1>
+            <input
+              id="content"
+              type="text"
+              class="form-control add-todo"
+              placeholder="할 일을 입력하고 엔터를 치세요"
+              autofocus
+            />
+            <hr />
+            <ul id="todoList" class="list-unstyled">
+              <li class="ui-state-default">
+                <div class="checkbox">
+                  <label>
+                    <input onchange="" type="checkbox" />
+                    <span>밥먹기</span>
+                  </label>
+                </div>
+              </li>
+            </ul>
+            <div class="todo-footer">
+              <strong>
+                <span id="todoCount" class="count-todos">1</span>
+              </strong>
+              항목 남았음
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="todolist">
+            <h1>DONE LIST</h1>
+            <ul id="doneList" class="list-unstyled">
+              <li>
+                <div class="checkbox">
+                  <label>
+                    <input
+                      onchange=""
+                      class="remove-item"
+                      type="checkbox"
+                      value=""
+                    />
+                    <span>잠자기</span>
+                  </label>
+                  <button
+                    onclick=""
+                    class="remove-item btn btn-default btn-xs pull-right"
+                  >
+                    <span class="glyphicon glyphicon-remove"></span>
+                  </button>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+  <script src="./todoList.js"></script>
+  <script>
+    const content = document.querySelector("#content");
+    content.addEventListener("keyup",(e)=>{
+        if(e.key != "Enter")return;
+        
+        if(content.value != ""){  
+          insert();
+          return;
+        }
+        else{
+          alert("값을 입력하세요.");
+          return;
+        }        
+      });
+    const init = () =>{
+      const docTodoList = document.querySelector("#todoList");
+      docTodoList.innerHTML = "";
+      const docDoneList = document.querySelector("#doneList");
+      docDoneList.innerHTML = "";
+      const todoData = localStorage.getItem('data');
+      const data = JSON.parse(todoData);    
+      const todoList = data.list.filter(data=> data.doneYn == "N");
+      const todoCount = todoList.length;
+      for(i = 0; i < todoCount; i++){
+        docTodoList.innerHTML += `
+              <li class="ui-state-default">
+                <div class="checkbox">
+                  <label>
+                    <input onchange="modi(${todoList[i].idx})" type="checkbox" />
+                    <span>${todoList[i].content}</span>
+                  </label>
+                </div>
+              </li>`
+      }
+      document.querySelector("#todoCount").innerHTML = `${todoCount}`;
+      const doneList = data.list.filter(data=> data.doneYn == "Y");
+      const doneCount = doneList.length;
+      for(i = 0; i < doneCount; i++){
+        docDoneList.innerHTML += `
+              <li>
+                <div class="checkbox">
+                  <label>
+                    <input
+                      onchange="modi(${doneList[i].idx})"
+                      class="remove-item"
+                      type="checkbox"
+                      value=""
+                    />
+                    <span>${doneList[i].content}</span><br>
+                  </label>
+                  <button
+                    onclick="del(${doneList[i].idx})"
+                    class="remove-item btn btn-default btn-xs pull-right"
+                  >
+                    <span class="glyphicon glyphicon-remove"></span>
+                  </button>
+                </div>
+              </li>
+              `;
+      }
+    }
+    const modi = (idxx)=>{
+      const dataJson = localStorage.getItem("data");
+      const data = JSON.parse(dataJson);
+      const index = data.list.findIndex(todo => todo.idx == idxx);
+      data.list[index].doneYn = data.list[index].doneYn =="N" ? "Y" : "N";
+      localStorage.setItem("data",JSON.stringify(data));
+      init();
+      return;
+    }
+    const del = (idxx)=>{
+      console.log(idxx);
+      const dataJson = localStorage.getItem("data");
+      const data = JSON.parse(dataJson);
+      const index = data.list.findIndex(todo => todo.idx == idxx);
+      data.list.splice(index,1);
+      localStorage.setItem("data",JSON.stringify(data));
+      init();
+      return;
+    }
+    const insert = () =>{
+      const dataJson = localStorage.getItem("data");
+      const data = JSON.parse(dataJson);
+      const newIndex = data.globalCount +1 ;
+      const todo = {
+        idx : newIndex,
+        content : content.value,
+        doneYn : "N"
+      }
+      data.globalCount = newIndex;
+      data.list.push(todo);
+      localStorage.setItem("data",JSON.stringify(data));
+      alert(content.value+"를 추가했습니다.");
+      init();
+      content.value = "";
+    }
+    init();
+    
+    
+    
+    console.log("스타일 참고", "https://bootsnipp.com/snippets/QbN51");
+  </script>
+</html>
